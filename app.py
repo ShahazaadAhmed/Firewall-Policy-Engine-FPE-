@@ -20,18 +20,10 @@ import datetime
 import sys
 import argparse
 import customtkinter as ctk
-
-# -------------------------
-# Config / Demo flag
-# -------------------------
 parser = argparse.ArgumentParser()
 parser.add_argument("--demo", action="store_true", help="Run in demo mode (no sudo, simulate deploy).")
 args = parser.parse_args()
 DEMO_MODE = args.demo
-
-# -------------------------
-# Backend: NFTManager (unchanged behavior, but simulated in demo)
-# -------------------------
 class NFTManager:
     def __init__(self, nft_bin="nft", demo=False):
         self.nft_bin = nft_bin
@@ -39,9 +31,7 @@ class NFTManager:
 
     def _run(self, args, input_text=None, use_sudo=False):
         if self.demo:
-            # simulate a successful parse/apply
             if "-f" in args:
-                # pretend parse ok
                 return 0, "Simulated nft output (demo mode).", ""
             return 0, "Simulated list ruleset (demo mode).", ""
         cmd = []
@@ -67,10 +57,6 @@ class NFTManager:
             return True, "Demo-mode: deploy simulated (no changes)."
         rc, out, err = self._run(["-f", "-"], input_text=ruleset_text, use_sudo=True)
         return rc == 0, out if rc == 0 else err
-
-# -------------------------
-# SQLite policy DB
-# -------------------------
 class PolicyDB:
     def __init__(self, path="policies_customtk.db"):
         self.path = path
@@ -127,9 +113,6 @@ class PolicyDB:
         cur.execute("SELECT id, action, policy_id, detail, created_at FROM audit ORDER BY id DESC LIMIT ?", (limit,))
         return cur.fetchall()
 
-# -------------------------
-# Safety heuristic (same simple SSH check)
-# -------------------------
 def check_ssh_safe(ruleset_text):
     lowered = ruleset_text.lower()
     if "policy drop" not in lowered and "policy deny" not in lowered:
@@ -142,11 +125,8 @@ def check_ssh_safe(ruleset_text):
         return True, "Has 'ct state established,related accept' — established connections allowed."
     return False, "Global DROP/deny policy present and no explicit SSH accept detected. This may lock you out."
 
-# -------------------------
-# CustomTkinter UI
-# -------------------------
-ctk.set_appearance_mode("dark")   # "dark" or "light"
-ctk.set_default_color_theme("blue")  # or "green", "dark-blue"
+ctk.set_appearance_mode("dark") 
+ctk.set_default_color_theme("blue")
 
 class App(ctk.CTk):
     def __init__(self, manager, db):
@@ -156,18 +136,15 @@ class App(ctk.CTk):
         self.title("Firewall Deployer — CustomTkinter")
         self.geometry("1200x720")
 
-        # Top header
         header = ctk.CTkFrame(self, height=80)
         header.pack(fill="x", padx=12, pady=(12,6))
         ctk.CTkLabel(header, text="Firewall Deployer", font=ctk.CTkFont(size=20, weight="bold")).pack(side="left", padx=12)
         mode_label = "DEMO MODE" if self.manager.demo else "REAL MODE"
         ctk.CTkLabel(header, text=mode_label, fg_color=("gray20","gray30"), corner_radius=10, padx=10).pack(side="right", padx=12)
 
-        # Main content frame
         content = ctk.CTkFrame(self)
         content.pack(fill="both", expand=True, padx=12, pady=6)
 
-        # Left: editor
         left = ctk.CTkFrame(content)
         left.pack(side="left", fill="both", expand=True, padx=(6,6), pady=6)
 
@@ -188,7 +165,6 @@ class App(ctk.CTk):
         self.editor.insert("0.0", sample)
         self.editor.pack(fill="both", expand=True, padx=6, pady=(4,6))
 
-        # Buttons under editor
         btn_frame = ctk.CTkFrame(left, height=44)
         btn_frame.pack(fill="x", padx=6, pady=(0,6))
         ctk.CTkButton(btn_frame, text="Save Version", command=self.save_version, width=120).pack(side="left", padx=6, pady=6)
@@ -197,7 +173,6 @@ class App(ctk.CTk):
         self.deploy_btn = ctk.CTkButton(btn_frame, text="Deploy", command=self.on_deploy, fg_color="red", width=100)
         self.deploy_btn.pack(side="right", padx=6)
 
-        # Center: preview + audit
         center = ctk.CTkFrame(content, width=420)
         center.pack(side="left", fill="both", padx=(6,6), pady=6, expand=False)
 
@@ -213,26 +188,21 @@ class App(ctk.CTk):
         self.audit.configure(state="disabled")
         self.audit.pack(fill="both", padx=6, pady=(4,6))
 
-        # Right: versions (Treeview)
         right = ctk.CTkFrame(content, width=300)
         right.pack(side="right", fill="y", padx=(6,12), pady=6)
 
         ctk.CTkLabel(right, text="Saved Versions").pack(anchor="w", padx=6, pady=(6,0))
         self.tree = ctk.CTkScrollableFrame(right)
         self.tree.pack(fill="both", expand=True, padx=6, pady=(4,6))
-        # We'll render simple buttons for recent versions inside the scrollable frame
         self._load_version_buttons()
 
-        # Status bar
         status = ctk.CTkFrame(self, height=28)
         status.pack(fill="x", side="bottom")
         self.status_var = ctk.StringVar(value="Ready")
         ctk.CTkLabel(status, textvariable=self.status_var, anchor="w").pack(side="left", padx=8)
 
-        # Bind editor change -> update preview (basic timer)
         self.editor.bind("<<Modified>>", self._on_edit_modified)
 
-        # initial audit refresh
         self._refresh_audit_log()
 
     def _set_status(self, text):
@@ -250,7 +220,6 @@ class App(ctk.CTk):
         self.preview.configure(state="disabled")
 
     def _load_version_buttons(self):
-        # remove existing
         for w in self.tree.winfo_children():
             w.destroy()
         rows = self.db.list_policies(limit=100)
@@ -273,8 +242,6 @@ class App(ctk.CTk):
         for id_, action, pid, detail, created in rows:
             self.audit.insert("0.0", f"[{created}] {action} pid={pid} {detail}\n" + self.audit.get("0.0", "end"))
         self.audit.configure(state="disabled")
-
-    # Actions
     def save_version(self):
         content = self.editor.get("0.0", "end").strip()
         if not content:
@@ -372,9 +339,6 @@ class App(ctk.CTk):
         self._refresh_audit_log()
         self._load_version_buttons()
 
-# -------------------------
-# Run
-# -------------------------
 def main():
     manager = NFTManager(demo=DEMO_MODE)
     db = PolicyDB()
@@ -384,3 +348,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
