@@ -263,9 +263,3 @@ Contributions are welcome! You can help by:
 * Adding rule templates
 * Enhancing UI features
 * Adding import/export support
-
----
-
-## Author
-
-[Your Name](https://github.com/your-username)
