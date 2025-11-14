@@ -261,4 +261,3 @@ Contributions are welcome! You can help by:
 ## License
 
 This project is licensed under the **MIT License**.
----
