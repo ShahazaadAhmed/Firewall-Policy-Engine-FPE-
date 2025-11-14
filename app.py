@@ -1,3 +1,17 @@
+# ==============================================================
+#  Firewall Policy Engine (FPE)
+#  Author: Mohammad Shahazaad Ahmed
+#
+#  LEGAL DISCLAIMER:
+#  This software is provided for educational and research use only.
+#  It is NOT intended for use on production environments or
+#  unauthorized systems.
+#
+#  Any damage, misconfiguration, or security impact caused by
+#  using this tool is solely the user's responsibility.
+#
+#  Proceed with caution.
+# ==============================================================
 import os
 import sqlite3
 import subprocess
@@ -368,4 +382,5 @@ def main():
     app.mainloop()
 
 if __name__ == "__main__":
+
     main()
