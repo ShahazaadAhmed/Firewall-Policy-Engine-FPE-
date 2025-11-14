@@ -99,6 +99,7 @@ python app.py --demo
 ```
 
 No firewall changes are made.
+⚠️ Turn Real Time Protection off if your using the executable app (Antivirus sees changing policies as a threat)
 
 ### ⚠️ Run in Real Deployment Mode
 
