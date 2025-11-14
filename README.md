@@ -249,12 +249,6 @@ Every action is written with:
 
 ---
 
-## License
-
-This project is licensed under the **MIT License**.
-
----
-
 ## Contribution
 
 Contributions are welcome! You can help by:
@@ -263,3 +257,8 @@ Contributions are welcome! You can help by:
 * Adding rule templates
 * Enhancing UI features
 * Adding import/export support
+---
+
+## License
+
+This project is licensed under the **MIT License**.
